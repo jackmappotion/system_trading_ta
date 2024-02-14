@@ -1,0 +1,20 @@
+# Personal
+
+# Data
+data/
+
+# Jupyter Notebook
+*.ipynb_checkpoints/
+*.ipynb
+!bollinger_band_checker.ipynb
+!moving_average_checker.ipynb
+!relative_strength_checker.ipynb
+
+# Python
+__pycache__/
+
+# vscode
+.vscode/
+
+# Mac
+.DS_Store
