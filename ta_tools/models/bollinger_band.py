@@ -21,11 +21,11 @@ class BollingerBandModel(Model):
 
 
 class SimpleBollingerBandModel(BollingerBandModel):
-    def __init__(self, prices, CFG: SBB_CFG) -> None:
+    def __init__(self, prices: pd.Series, CFG: SBB_CFG) -> None:
         self.prices = prices.rename("price")
         self.CFG = CFG
 
-    def indicator(self):
+    def indicator(self) -> pd.DataFrame:
         rolled_prices = self._get_rolled_series(self.prices, self.CFG["window"])
         ma_price = rolled_prices.mean().rename("ma_price")
 
@@ -36,7 +36,7 @@ class SimpleBollingerBandModel(BollingerBandModel):
         indicator = pd.concat([self.prices, ma_price, upper_band, lower_band], axis=1)
         return indicator
 
-    def signal(self, indicator, continuous, trend):
+    def signal(self, indicator: pd.DataFrame, continuous: bool, trend: bool):
         if continuous:
             signal = self._continuous_signal(indicator)
         else:
@@ -48,17 +48,17 @@ class SimpleBollingerBandModel(BollingerBandModel):
     def _discreate_signal(self, indicator):
         signal = indicator.copy()
         signal["signal"] = 0.0
-        
+
         over_band = signal["upper_band"] < signal["price"]
         under_band = signal["price"] < signal["lower_band"]
-        
+
         signal.loc[over_band, "signal"] = -1.0
         signal.loc[under_band, "signal"] = 1.0
         return signal
 
     def _continuous_signal(self, indicator):
         signal = self._discreate_signal(indicator)
-        
+
         over_band = signal["upper_band"] < signal["price"]
         under_band = signal["price"] < signal["lower_band"]
         in_band = ~(over_band | under_band)
